@@ -3,7 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path')
 const parser = require('./parser')
-const fs = require('fs')
+
 
 
 const app = express();
@@ -20,19 +20,15 @@ app.get('/', (req, res) => {
 
 app.post('/', (req, res) => {
   const postData = req.body;
-  // const parseDataToObj = JSON.parse(postData)
+
   console.log(postData);
 
   let parse = new parser(postData.theme).getArticles(res)
 
-//   const URL = path.join(__dirname, 'articles.json')
-// setTimeout(() => {
-//   res.sendFile(URL)
-// }, 4000)
 
 });
 
-// Создаем HTTP-сервер и слушаем порт 3000
+
 http.createServer(app).listen(3000, () => {
   console.log('Сервер запущен на порту 3000');
 });
