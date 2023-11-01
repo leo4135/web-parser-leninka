@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Form</title>
+</head>
+<body>
+<h2>Парсер написан для web-ресурса "Kiberleninka"</h2>
+<input type="text" placeholder="Введите интересующую вас тему">
+<button onclick="getArticles()">Получить данные</button>
+<div class="preloader" style="display: none">Получаем данные...</div>
+<div class="wrapper">
+</div>
+<script>
+  function getArticles() {
+    const WRAPPER = document.querySelector('.wrapper')
+    WRAPPER.innerHTML = ''
+    const preloader = document.querySelector('.preloader');
+    preloader.style.display = 'block';
+    const getTheme = document.querySelector('input');
+      fetch('http://192.168.1.240:3000', {
+        headers: {
+          "content-type" : "application/json"
+        },
+        body: JSON.stringify({theme : getTheme.value}),
+        method: 'POST'
+      }).then(res => res.json()).then(data => {
+        getTheme.value = ''
+        console.log(data)
+        preloader.style.display = 'none'
+        let count = data.length
+        let countDIV = document.createElement('h2')
+        countDIV.innerHTML = `Всего статей найдено: ${count}`
+        WRAPPER.appendChild(countDIV)
+        data.forEach((obj) => {
+          let elem = document.createElement('div');
+          elem.style = 'margin: 50px;  background: aliceblue; padding: 20px;';
+          for (let key in obj) {
+            elem.innerHTML += `<p>${obj[key]}</p>`
+          }
+          WRAPPER.appendChild(elem)
+        })
+
+      })
+  }
+</script>
+</body>
+</html>
