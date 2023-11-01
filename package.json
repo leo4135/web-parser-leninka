@@ -4,8 +4,7 @@
   "description": "",
   "main": "parser.js",
   "scripts": {
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "server:start": "node server.js"
   },
   "author": "",
   "license": "ISC",
