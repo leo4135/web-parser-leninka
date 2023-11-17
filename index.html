@@ -25,6 +25,7 @@
         body: JSON.stringify({theme : getTheme.value}),
         method: 'POST'
       }).then(res => res.json()).then(data => {
+        console.log(data)
         getTheme.value = ''
         console.log(data)
         preloader.style.display = 'none'
@@ -35,9 +36,7 @@
         data.forEach((obj) => {
           let elem = document.createElement('div');
           elem.style = 'margin: 50px;  background: aliceblue; padding: 20px;';
-          for (let key in obj) {
-            elem.innerHTML += `<p>${obj[key]}</p>`
-          }
+            elem.innerHTML += `<p>${obj["name"]}</p><a href="https://cyberleninka.ru${obj["link"]}" target="_blank">https://cyberleninka.ru${obj["link"]}</a><p>${obj["annotation"]}</p><p>${obj["year"]}</p><p>${obj["authors"]}</p>`
           WRAPPER.appendChild(elem)
         })
 
