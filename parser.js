@@ -1,10 +1,11 @@
 const fs = require('fs');
+const {JSDOM} = require('jsdom');
 
 module.exports = class parser {
-#theme
+  #theme
 
   constructor(theme) {
-  this.#theme = theme
+    this.#theme = theme
   }
 
   getArticles(res) {
@@ -57,15 +58,53 @@ module.exports = class parser {
         })
           .then(res => res.json())
           .then(data => {
-            if (data.articles) {
-              let test = JSON.stringify(data.articles)
-              res.send(test)
-              fs.writeFile('articles.json', test, (err) => {
-                if (err) {
-                  console.error(err)
-                }
+            let keyWordsHTML = [];
+            let links = [];
+            data.articles.forEach((item) => {
+              links.push(`https://cyberleninka.ru${item['link']}`)
+            })
+
+
+            links.forEach((item) => {
+              fetch(item, {
+                "headers": {
+                  "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+                  "accept-language": "ru,en;q=0.9",
+                  "sec-ch-ua": "\"Chromium\";v=\"116\", \"Not)A;Brand\";v=\"24\", \"YaBrowser\";v=\"23\"",
+                  "sec-ch-ua-mobile": "?1",
+                  "sec-ch-ua-platform": "\"Android\"",
+                  "sec-fetch-dest": "document",
+                  "sec-fetch-mode": "navigate",
+                  "sec-fetch-site": "same-origin",
+                  "sec-fetch-user": "?1",
+                  "upgrade-insecure-requests": "1"
+                },
+                "referrer": "https://cyberleninka.ru/search?q=XSS&page=1",
+                "referrerPolicy": "strict-origin-when-cross-origin",
+                "body": null,
+                "method": "GET",
+                "mode": "cors",
+                "credentials": "include"
+              }).then(res => res.text()).then(data => {
+                keyWordsHTML.push(data)
               })
-            }
+            })
+
+            setTimeout(() => {
+              console.log(keyWordsHTML)
+              if (data.articles) {
+                data.keyWordsHTML = keyWordsHTML
+                let test = JSON.stringify(data)
+                res.send(test)
+                fs.writeFile('articles.json', test, (err) => {
+                  if (err) {
+                    console.error(err)
+                  }
+                })
+              }
+            }, 3000)
+
+
           })
       })
   }

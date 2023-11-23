@@ -25,21 +25,66 @@
         body: JSON.stringify({theme : getTheme.value}),
         method: 'POST'
       }).then(res => res.json()).then(data => {
-        console.log(data)
+
         getTheme.value = ''
-        console.log(data)
+
         preloader.style.display = 'none'
-        let count = data.length
+        let count = data.articles.length
         let countDIV = document.createElement('h2')
         countDIV.innerHTML = `Всего статей найдено: ${count}`
         WRAPPER.appendChild(countDIV)
-        data.forEach((obj) => {
+
+        let allWordsFromAnnotation = [];
+        let topAuthors = {};
+
+        data.articles.forEach((obj, index) => {
+          let allWords = obj["annotation"].split(' ')
+          allWords.forEach((item) => {
+            allWordsFromAnnotation.push(item)
+          })
+          allWordsFromAnnotation.push(obj["annotation"])
           let elem = document.createElement('div');
           elem.style = 'margin: 50px;  background: aliceblue; padding: 20px;';
             elem.innerHTML += `<p>${obj["name"]}</p><a href="https://cyberleninka.ru${obj["link"]}" target="_blank">https://cyberleninka.ru${obj["link"]}</a><p>${obj["annotation"]}</p><p>${obj["year"]}</p><p>${obj["authors"]}</p>`
           WRAPPER.appendChild(elem)
+          let authorViews = document.createElement('div');
+            authorViews.innerHTML = data.keyWordsHTML[index]
+            let currentViews = authorViews.querySelector('.views');
+            if (currentViews) {
+              topAuthors[`${index}`] = {'author': obj["authors"] }
+              topAuthors[`${index}`].counter = currentViews.innerText
+            }
+
         })
 
+
+        let keyWords = document.createElement('div');
+        let newDiv = document.createElement('div');
+        newDiv.innerHTML = '<p><h1>Ключевые слова: </h1></p>';
+
+
+        for (let i = 0; i < data.keyWordsHTML.length; i++) {
+          keyWords.innerHTML = data.keyWordsHTML[i];
+
+          let selectKeyWords = keyWords.querySelectorAll('.to-search');
+
+
+          selectKeyWords.forEach((item) => {
+            newDiv.innerHTML += item.innerText + ' ';
+          })
+        }
+
+        WRAPPER.prepend(newDiv);
+
+        let divAuthors = document.createElement('div');
+        divAuthors.innerHTML = `<p><h2>Топ авторов статей по кол-ву скачиваний:</h2></p>`
+        let newSortedAuthors = Object.entries(topAuthors).sort(([,a],[,b]) => b.counter - a.counter)
+
+        for (let value of newSortedAuthors) {
+          divAuthors.innerHTML += `<p>${value[1].author} - ${value[1].counter}</p>`
+        }
+        console.log(divAuthors)
+        WRAPPER.prepend(divAuthors);
       })
   }
 </script>
